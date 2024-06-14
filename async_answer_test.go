@@ -96,3 +96,14 @@ func TestRepetitionCallWaitAnswer(t *testing.T) {
 		return
 	}
 }
+
+func TestDelete(t *testing.T) {
+	const reqKey = "reqKey5"
+	req, _ := ApplyReq(reqKey)
+	req.Delete()
+	_, ok := ApplyReq(reqKey)
+	if !ok {
+		t.Errorf("错误, 无法申请")
+		return
+	}
+}

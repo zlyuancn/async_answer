@@ -24,6 +24,8 @@ type AsyncAnswer interface {
 type Req interface {
 	// 等待响应, timeout=0表示永久等待
 	WaitAnswer(timeout time.Duration) (interface{}, error)
+	// 删除, 如果进行请求可以删除这个req, 如果执行了 WaitAnswer 则这个方法无效
+	Delete()
 }
 
 type asyncAnswer struct {
@@ -138,6 +140,15 @@ func (r *reqCli) WaitAnswer(timeout time.Duration) (interface{}, error) {
 	}
 
 	return r.w.v, r.w.e
+}
+func (r *reqCli) Delete() {
+	if !atomic.CompareAndSwapUint32(&r.isWait, 0, 1) {
+		return
+	}
+
+	r.mx.Lock()
+	delete(r.waits, r.key)
+	r.mx.Unlock()
 }
 
 // 响应
