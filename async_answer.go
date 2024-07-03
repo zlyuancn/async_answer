@@ -24,7 +24,7 @@ type AsyncAnswer interface {
 type Req interface {
 	// 等待响应, timeout=0表示永久等待
 	WaitAnswer(timeout time.Duration) (interface{}, error)
-	// 删除, 如果进行请求可以删除这个req, 如果执行了 WaitAnswer 则这个方法无效
+	// 删除, 如果取消请求可以删除这个req, 如果执行了 WaitAnswer 则这个方法无效
 	Delete()
 }
 
@@ -170,9 +170,12 @@ func (a *asyncAnswer) AnswerReq(key string, v interface{}, e error) {
 
 var defAA = NewAsyncAnswer()
 
+// 申请一个请求
 func ApplyReq(key string) (Req, bool) {
 	return defAA.ApplyReq(key)
 }
+
+// 响应一个请求
 func AnswerReq(key string, v interface{}, e error) {
 	defAA.AnswerReq(key, v, e)
 }
